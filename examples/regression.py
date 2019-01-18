@@ -5,12 +5,11 @@
 import autograd.numpy as np
 import autograd.numpy.random as npr
 
-from neuralfingerprint import load_data
-from neuralfingerprint import build_morgan_deep_net
-from neuralfingerprint import build_conv_deep_net
-from neuralfingerprint import normalize_array, adam
-from neuralfingerprint import build_batched_grad
-from neuralfingerprint.util import rmse
+from neuralfingerprint.io_utils import load_data
+from neuralfingerprint.build_vanilla_net import build_morgan_deep_net
+from neuralfingerprint.build_convnet import build_conv_deep_net
+from neuralfingerprint.util import normalize_array, rmse, build_batched_grad
+from neuralfingerprint.optimizers import adam
 
 from autograd import grad
 
@@ -21,7 +20,7 @@ N_val   = 20
 N_test  = 20
 
 model_params = dict(fp_length=50,    # Usually neural fps need far fewer dimensions than morgan.
-                    fp_depth=4,      # The depth of the network equals the fingerprint radius.
+                    fp_depth=4,      # The depth of the network equals the fingerprint(radius.)
                     conv_width=20,   # Only the neural fps need this parameter.
                     h1_size=100,     # Size of hidden layer of network on top of fps.
                     L2_reg=np.exp(-2))
@@ -38,7 +37,7 @@ vanilla_net_params = dict(
 def train_nn(pred_fun, loss_fun, num_weights, train_smiles, train_raw_targets, train_params, seed=0,
              validation_smiles=None, validation_raw_targets=None):
     """loss_fun has inputs (weights, smiles, targets)"""
-    print "Total number of weights in the network:", num_weights
+    print("Total number of weights in the network:", num_weights)
     init_weights = npr.RandomState(seed).randn(num_weights) * train_params['init_scale']
 
     num_print_examples = 100
@@ -46,15 +45,14 @@ def train_nn(pred_fun, loss_fun, num_weights, train_smiles, train_raw_targets, t
     training_curve = []
     def callback(weights, iter):
         if iter % 10 == 0:
-            print "max of weights", np.max(np.abs(weights))
+            print("max of weights", np.max(np.abs(weights)))
             train_preds = undo_norm(pred_fun(weights, train_smiles[:num_print_examples]))
             cur_loss = loss_fun(weights, train_smiles[:num_print_examples], train_targets[:num_print_examples])
             training_curve.append(cur_loss)
-            print "Iteration", iter, "loss", cur_loss,\
-                  "train RMSE", rmse(train_preds, train_raw_targets[:num_print_examples]),
+            print("Iteration", iter, "loss", cur_loss, "train RMSE", rmse(train_preds, train_raw_targets[:num_print_examples]),)
             if validation_smiles is not None:
                 validation_preds = undo_norm(pred_fun(weights, validation_smiles))
-                print "Validation RMSE", iter, ":", rmse(validation_preds, validation_raw_targets),
+                print("Validation RMSE", iter, ":", rmse(validation_preds, validation_raw_targets),)
 
     # Build gradient using autograd.
     grad_fun = grad(loss_fun)
@@ -72,7 +70,7 @@ def train_nn(pred_fun, loss_fun, num_weights, train_smiles, train_raw_targets, t
 
 
 def main():
-    print "Loading data..."
+    print("Loading data...")
     traindata, valdata, testdata = load_data(
         task_params['data_file'], (N_train, N_val, N_test),
         input_name='smiles', target_name=task_params['target_name'])
@@ -83,10 +81,10 @@ def main():
     def print_performance(pred_func):
         train_preds = pred_func(train_inputs)
         val_preds = pred_func(val_inputs)
-        print "\nPerformance (RMSE) on " + task_params['target_name'] + ":"
-        print "Train:", rmse(train_preds, train_targets)
-        print "Test: ", rmse(val_preds,  val_targets)
-        print "-" * 80
+        print("\nPerformance (RMSE) on " + task_params['target_name'] + ":")
+        print("Train:", rmse(train_preds, train_targets))
+        print("Test: ", rmse(val_preds,  val_targets))
+        print("-" * 80)
         return rmse(val_preds, val_targets)
 
     def run_morgan_experiment():
@@ -112,14 +110,12 @@ def main():
         test_predictions = predict_func(test_inputs)
         return rmse(test_predictions, test_targets)
 
-    print "Task params", task_params
-    print
-    print "Starting Morgan fingerprint experiment..."
+    print("Task params", task_params)
+    print("Starting Morgan fingerprint(experiment...")
     test_loss_morgan = run_morgan_experiment()
-    print "Starting neural fingerprint experiment..."
+    print("Starting neural fingerprint(experiment...")
     test_loss_neural = run_conv_experiment()
-    print
-    print "Morgan test RMSE:", test_loss_morgan, "Neural test RMSE:", test_loss_neural
+    print("Morgan test RMSE:", test_loss_morgan, "Neural test RMSE:", test_loss_neural)
 
 if __name__ == '__main__':
     main()

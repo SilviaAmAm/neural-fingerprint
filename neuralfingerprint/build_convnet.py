@@ -1,10 +1,10 @@
 import autograd.numpy as np
 from autograd.scipy.misc import logsumexp
 
-from features import num_atom_features, num_bond_features
-from util import memoize, WeightsParser
-from mol_graph import graph_from_smiles_tuple, degrees
-from build_vanilla_net import build_fingerprint_deep_net, relu, batch_normalize
+from .features import num_atom_features, num_bond_features
+from .util import memoize, WeightsParser
+from .mol_graph import graph_from_smiles_tuple, degrees
+from .build_vanilla_net import build_fingerprint_deep_net, relu, batch_normalize
 
 
 def fast_array_from_list(xs):
@@ -88,7 +88,7 @@ def build_convnet_fingerprint_fun(num_hidden_features=[100, 100], fp_length=512,
             all_layer_fps.append(layer_output)
 
         num_layers = len(num_hidden_features)
-        for layer in xrange(num_layers):
+        for layer in range(num_layers):
             write_to_fingerprint(atom_features, layer)
             atom_features = update_layer(weights, layer, atom_features, bond_features, array_rep,
                                          normalize=normalize)

@@ -1,7 +1,7 @@
-from util import memoize, WeightsParser
-from rdkit_utils import smiles_to_fps
-from build_convnet import build_convnet_fingerprint_fun
-from build_vanilla_net import build_fingerprint_deep_net
+from .util import memoize, WeightsParser
+from .rdkit_utils import smiles_to_fps
+from .build_convnet import build_convnet_fingerprint_fun
+from .build_vanilla_net import build_fingerprint_deep_net
 
 import autograd.numpy as np
 

@@ -5,7 +5,7 @@ def sgd(grad, x, callback=None, num_iters=200, step_size=0.1, mass=0.9):
     """Stochastic gradient descent with momentum.
     grad() has signature grad(x, i), where i is the iteration."""
     velocity = np.zeros(len(x))
-    for i in xrange(num_iters):
+    for i in range(num_iters):
         g = grad(x, i)
         if callback: callback(x, i)
         velocity = mass * velocity - (1.0 - mass) * g

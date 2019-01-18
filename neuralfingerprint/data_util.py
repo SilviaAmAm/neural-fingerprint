@@ -58,7 +58,7 @@ def valid_smiles(smile):
         smile_to_fp(smile, 1, 10)
         return True
     except:
-        print "Couldn't parse", smile
+        print("Couldn't parse", smile)
         return False
 
 def has_duplicates(A):
